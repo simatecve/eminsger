@@ -29,6 +29,7 @@ export default function Navbar() {
     { name: 'Servicios', path: '/servicios' },
     { name: 'Proyectos', path: '/proyectos' },
     { name: 'Sucursales', path: '/sucursales' },
+    { name: 'Asistente AI', path: '/asistente-ai' },
   ];
 
   return (

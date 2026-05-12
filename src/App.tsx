@@ -8,6 +8,7 @@ import ProjectDetails from './pages/ProjectDetails';
 import Branches from './pages/Branches';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
+import AIAssistant from './pages/AIAssistant';
 
 export default function App() {
   return (
@@ -15,6 +16,7 @@ export default function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/asistente-ai" element={<AIAssistant />} />
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
           <Route path="nosotros" element={<About />} />
