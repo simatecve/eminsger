@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Linkedin, Mail, ArrowRight, Menu, X } from 'lucide-react';
 import { clsx } from 'clsx';
 import { Link, useLocation } from 'react-router-dom';
+import logo1 from '../logo1.jpeg';
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -36,22 +37,17 @@ export default function Navbar() {
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        className={clsx(
-          'fixed top-0 left-0 right-0 z-50 transition-all duration-500 flex items-center justify-between px-6 py-4',
-          scrolled ? 'top-4 mx-auto max-w-7xl rounded-full glass-pill text-hyundai-navy shadow-lg' : 'text-white'
-        )}
+        className="fixed top-0 left-0 right-0 z-50 bg-white shadow-md flex items-center justify-between px-6 py-4 text-hyundai-navy"
       >
         <Link to="/" className="flex items-center gap-4 z-50">
-          {/* Logo Image Placeholder - User will replace this with their actual logo */}
-          <div className="h-10 bg-white/10 rounded px-2 flex items-center justify-center overflow-hidden">
+          <div className="rounded px-2 flex items-center justify-center">
             <img 
-              src="/logo.png" 
+              src={logo1} 
               alt="One World Group Emingser Logo" 
-              className="h-8 object-contain"
+              className="h-25 object-contain"
               onError={(e) => {
-                // Fallback to text if image not found
                 e.currentTarget.style.display = 'none';
-                e.currentTarget.parentElement!.innerHTML = '<span class="font-display font-bold text-xl tracking-tight">ONE WORLD</span> <span class="font-serif italic text-xl ml-2">EMINGSER</span>';
+                e.currentTarget.parentElement!.innerHTML = '<span class="font-display font-bold text-xl tracking-tight">ONE WORLD</span> <span class="font-serif italic text-xl ml-2 text-hyundai-navy">EMINGSER</span>';
               }}
             />
           </div>
@@ -91,15 +87,14 @@ export default function Navbar() {
           </button>
         </div>
 
-        {/* Mobile Menu Toggle */}
         <button 
           className="lg:hidden z-50 p-2"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         >
           {isMobileMenuOpen ? (
-            <X className={clsx("w-6 h-6", scrolled ? "text-hyundai-navy" : "text-white")} />
+            <X className="w-6 h-6 text-hyundai-navy" />
           ) : (
-            <Menu className={clsx("w-6 h-6", scrolled ? "text-hyundai-navy" : "text-white")} />
+            <Menu className="w-6 h-6 text-hyundai-navy" />
           )}
         </button>
       </motion.nav>

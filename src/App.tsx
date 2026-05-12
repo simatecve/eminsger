@@ -6,11 +6,15 @@ import Services from './pages/Services';
 import Projects from './pages/Projects';
 import ProjectDetails from './pages/ProjectDetails';
 import Branches from './pages/Branches';
+import Login from './pages/Login';
+import Dashboard from './pages/Dashboard';
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
           <Route path="nosotros" element={<About />} />
