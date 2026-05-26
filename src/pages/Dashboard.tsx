@@ -55,7 +55,7 @@ export default function Dashboard() {
     if (mainImage) {
       const { data: uploadData, error: uploadError } = await insforge.storage.from('project-images').upload(`${Date.now()}-${mainImage.name}`, mainImage);
       if (uploadData) {
-        imageUrl = insforge.storage.from('project-images').getPublicUrl(uploadData.path).data.publicUrl;
+        imageUrl = insforge.storage.from('project-images').getPublicUrl(uploadData.key);
       }
     }
 

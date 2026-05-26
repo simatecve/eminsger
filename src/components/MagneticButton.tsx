@@ -1,8 +1,8 @@
 import { useRef, useState } from 'react';
-import { motion } from 'motion/react';
+import { motion, type HTMLMotionProps } from 'motion/react';
 import { clsx } from 'clsx';
 
-interface MagneticButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface MagneticButtonProps extends HTMLMotionProps<'button'> {
   children: React.ReactNode;
   variant?: 'primary' | 'outline';
 }
