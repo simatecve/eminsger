@@ -101,6 +101,13 @@ export default function Dashboard() {
     }
     setUploading(true);
 
+    const { data: currentUserData, error: currentUserError } = await insforge.auth.getCurrentUser();
+    if (currentUserError || !currentUserData?.user) {
+      alert('Tu sesión expiró. Vuelve a iniciar sesión para subir imágenes.');
+      setUploading(false);
+      return;
+    }
+
     let imageUrl = editingProject?.main_image ?? '';
     if (mainImage) {
       const { data: uploadData, error: uploadError } = await insforge.storage

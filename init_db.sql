@@ -19,7 +19,9 @@ CREATE POLICY "Allow public read-only access" ON projects
   FOR SELECT USING (is_hidden = false);
 
 CREATE POLICY "Allow admin all access" ON projects
-  FOR ALL TO authenticated USING (auth.jwt() ->> 'email' = 'admin@emin.com');
+  FOR ALL TO authenticated
+  USING (EXISTS (SELECT 1 FROM auth.users u WHERE u.id = auth.uid() AND u.email = 'admin@emin.com'))
+  WITH CHECK (EXISTS (SELECT 1 FROM auth.users u WHERE u.id = auth.uid() AND u.email = 'admin@emin.com'));
 
 ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
 
@@ -27,22 +29,22 @@ DROP POLICY IF EXISTS admin_project_images_insert ON storage.objects;
 CREATE POLICY admin_project_images_insert ON storage.objects
   FOR INSERT TO authenticated
   WITH CHECK (
-    (bucket = 'project-images') AND (auth.jwt() ->> 'email' = 'admin@emin.com')
+    (bucket = 'project-images') AND (EXISTS (SELECT 1 FROM auth.users u WHERE u.id = auth.uid() AND u.email = 'admin@emin.com'))
   );
 
 DROP POLICY IF EXISTS admin_project_images_update ON storage.objects;
 CREATE POLICY admin_project_images_update ON storage.objects
   FOR UPDATE TO authenticated
   USING (
-    (bucket = 'project-images') AND (auth.jwt() ->> 'email' = 'admin@emin.com')
+    (bucket = 'project-images') AND (EXISTS (SELECT 1 FROM auth.users u WHERE u.id = auth.uid() AND u.email = 'admin@emin.com'))
   )
   WITH CHECK (
-    (bucket = 'project-images') AND (auth.jwt() ->> 'email' = 'admin@emin.com')
+    (bucket = 'project-images') AND (EXISTS (SELECT 1 FROM auth.users u WHERE u.id = auth.uid() AND u.email = 'admin@emin.com'))
   );
 
 DROP POLICY IF EXISTS admin_project_images_delete ON storage.objects;
 CREATE POLICY admin_project_images_delete ON storage.objects
   FOR DELETE TO authenticated
   USING (
-    (bucket = 'project-images') AND (auth.jwt() ->> 'email' = 'admin@emin.com')
+    (bucket = 'project-images') AND (EXISTS (SELECT 1 FROM auth.users u WHERE u.id = auth.uid() AND u.email = 'admin@emin.com'))
   );
