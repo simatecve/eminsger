@@ -23,6 +23,7 @@ export default function Dashboard() {
     scope: '',
   });
   const [mainImage, setMainImage] = useState<File | null>(null);
+  const [galleryImages, setGalleryImages] = useState<File[]>([]);
 
   useEffect(() => {
     if (user) {
@@ -47,8 +48,22 @@ export default function Dashboard() {
     }
   };
 
+  const handleGalleryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setGalleryImages(Array.from(e.target.files));
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!mainImage) {
+      alert('Selecciona una imagen principal.');
+      return;
+    }
+    if (galleryImages.length === 0) {
+      alert('Selecciona al menos una imagen para la galería.');
+      return;
+    }
     setUploading(true);
 
     let imageUrl = '';
@@ -59,10 +74,28 @@ export default function Dashboard() {
       }
     }
 
+    const galleryUrls: string[] = [];
+    if (galleryImages.length > 0) {
+      const uploads = await Promise.all(
+        galleryImages.map((file) =>
+          insforge.storage
+            .from('project-images')
+            .upload(`${Date.now()}-${Math.random().toString(16).slice(2)}-${file.name}`, file)
+        )
+      );
+
+      for (const result of uploads) {
+        if (result.data) {
+          galleryUrls.push(insforge.storage.from('project-images').getPublicUrl(result.data.key));
+        }
+      }
+    }
+
     const { error } = await insforge.database.from('projects').insert([
       {
         ...formData,
         main_image: imageUrl,
+        gallery: galleryUrls,
         scope: formData.scope.split(',').map(s => s.trim()).filter(s => s !== ''),
       },
     ]);
@@ -71,6 +104,7 @@ export default function Dashboard() {
       setIsAdding(false);
       setFormData({ title: '', year: '', location: '', description: '', client: '', duration: '', scope: '' });
       setMainImage(null);
+      setGalleryImages([]);
       fetchProjects();
     }
     setUploading(false);
@@ -150,7 +184,17 @@ export default function Dashboard() {
                     <label className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-slate-50 border-2 border-dashed border-slate-300 rounded-xl cursor-pointer hover:bg-slate-100 transition-all text-slate-500">
                       <Upload className="w-5 h-5" />
                       {mainImage ? mainImage.name : 'Subir Imagen'}
-                      <input type="file" onChange={handleImageChange} className="hidden" accept="image/*" />
+                      <input type="file" onChange={handleImageChange} className="hidden" accept="image/*" required />
+                    </label>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Galería (múltiples imágenes)</label>
+                  <div className="flex items-center gap-4">
+                    <label className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-slate-50 border-2 border-dashed border-slate-300 rounded-xl cursor-pointer hover:bg-slate-100 transition-all text-slate-500">
+                      <Upload className="w-5 h-5" />
+                      {galleryImages.length > 0 ? `${galleryImages.length} imagen(es) seleccionada(s)` : 'Subir Imágenes'}
+                      <input type="file" onChange={handleGalleryChange} className="hidden" accept="image/*" multiple required />
                     </label>
                   </div>
                 </div>
