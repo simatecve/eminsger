@@ -13,6 +13,7 @@ export default function Projects() {
       const { data, error } = await insforge.database
         .from('projects')
         .select('*')
+        .eq('is_hidden', false)
         .order('created_at', { ascending: false });
       
       if (data) setProjects(data);

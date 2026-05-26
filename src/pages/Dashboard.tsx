@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { insforge } from '../lib/insforge';
 import { useAuth } from '../contexts/AuthContext';
 import { motion } from 'motion/react';
-import { Plus, Trash2, LayoutDashboard, LogOut, Upload, Loader2, CheckCircle } from 'lucide-react';
+import { Plus, Trash2, LayoutDashboard, LogOut, Upload, Loader2, CheckCircle, Pencil, Eye, EyeOff } from 'lucide-react';
 import { Navigate } from 'react-router-dom';
 
 export default function Dashboard() {
@@ -10,6 +10,7 @@ export default function Dashboard() {
   const [projects, setProjects] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAdding, setIsAdding] = useState(false);
+  const [editingProject, setEditingProject] = useState<any | null>(null);
   const [uploading, setUploading] = useState(false);
 
   // Form state
@@ -24,6 +25,8 @@ export default function Dashboard() {
   });
   const [mainImage, setMainImage] = useState<File | null>(null);
   const [galleryImages, setGalleryImages] = useState<File[]>([]);
+
+  const isEditMode = Boolean(editingProject);
 
   useEffect(() => {
     if (user) {
@@ -54,21 +57,55 @@ export default function Dashboard() {
     }
   };
 
+  const openCreate = () => {
+    setEditingProject(null);
+    setFormData({ title: '', year: '', location: '', description: '', client: '', duration: '', scope: '' });
+    setMainImage(null);
+    setGalleryImages([]);
+    setIsAdding(true);
+  };
+
+  const openEdit = (project: any) => {
+    setEditingProject(project);
+    setFormData({
+      title: project.title ?? '',
+      year: project.year ?? '',
+      location: project.location ?? '',
+      description: project.description ?? '',
+      client: project.client ?? '',
+      duration: project.duration ?? '',
+      scope: Array.isArray(project.scope) ? project.scope.join(', ') : '',
+    });
+    setMainImage(null);
+    setGalleryImages([]);
+    setIsAdding(true);
+  };
+
+  const closeForm = () => {
+    setIsAdding(false);
+    setEditingProject(null);
+    setFormData({ title: '', year: '', location: '', description: '', client: '', duration: '', scope: '' });
+    setMainImage(null);
+    setGalleryImages([]);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!mainImage) {
+    if (!isEditMode && !mainImage) {
       alert('Selecciona una imagen principal.');
       return;
     }
-    if (galleryImages.length === 0) {
+    if (!isEditMode && galleryImages.length === 0) {
       alert('Selecciona al menos una imagen para la galería.');
       return;
     }
     setUploading(true);
 
-    let imageUrl = '';
+    let imageUrl = editingProject?.main_image ?? '';
     if (mainImage) {
-      const { data: uploadData, error: uploadError } = await insforge.storage.from('project-images').upload(`${Date.now()}-${mainImage.name}`, mainImage);
+      const { data: uploadData, error: uploadError } = await insforge.storage
+        .from('project-images')
+        .upload(`${Date.now()}-${mainImage.name}`, mainImage);
       if (uploadError || !uploadData) {
         alert(`Error subiendo la imagen principal${uploadError?.message ? `: ${uploadError.message}` : '.'}`);
         setUploading(false);
@@ -77,8 +114,9 @@ export default function Dashboard() {
       imageUrl = insforge.storage.from('project-images').getPublicUrl(uploadData.key);
     }
 
-    const galleryUrls: string[] = [];
+    let galleryUrls: string[] = Array.isArray(editingProject?.gallery) ? editingProject.gallery : [];
     if (galleryImages.length > 0) {
+      const nextGalleryUrls: string[] = [];
       for (const file of galleryImages) {
         const { data, error } = await insforge.storage
           .from('project-images')
@@ -88,31 +126,39 @@ export default function Dashboard() {
           setUploading(false);
           return;
         }
-        galleryUrls.push(insforge.storage.from('project-images').getPublicUrl(data.key));
+        nextGalleryUrls.push(insforge.storage.from('project-images').getPublicUrl(data.key));
       }
+      galleryUrls = nextGalleryUrls;
     }
 
-    const { error } = await insforge.database.from('projects').insert([
-      {
-        ...formData,
-        main_image: imageUrl,
-        gallery: galleryUrls,
-        scope: formData.scope.split(',').map(s => s.trim()).filter(s => s !== ''),
-      },
-    ]);
+    const payload = {
+      ...formData,
+      main_image: imageUrl,
+      gallery: galleryUrls,
+      scope: formData.scope.split(',').map(s => s.trim()).filter(s => s !== ''),
+    };
+
+    const { error } = isEditMode
+      ? await insforge.database.from('projects').update(payload).match({ id: editingProject!.id })
+      : await insforge.database.from('projects').insert([{ ...payload, is_hidden: false }]);
 
     if (!error) {
-      setIsAdding(false);
-      setFormData({ title: '', year: '', location: '', description: '', client: '', duration: '', scope: '' });
-      setMainImage(null);
-      setGalleryImages([]);
+      closeForm();
       fetchProjects();
     }
     setUploading(false);
   };
 
+  const handleToggleHidden = async (project: any) => {
+    const { error } = await insforge.database
+      .from('projects')
+      .update({ is_hidden: !project.is_hidden })
+      .match({ id: project.id });
+    if (!error) fetchProjects();
+  };
+
   const handleDelete = async (id: string) => {
-    if (confirm('¿Estás seguro de eliminar este proyecto?')) {
+    if (confirm('¿Eliminar este proyecto permanentemente?')) {
       const { error } = await insforge.database.from('projects').delete().match({ id });
       if (!error) fetchProjects();
     }
@@ -134,7 +180,7 @@ export default function Dashboard() {
           </div>
           <div className="flex items-center gap-4">
             <button 
-              onClick={() => setIsAdding(!isAdding)}
+              onClick={() => (isAdding ? closeForm() : openCreate())}
               className="bg-industrial-cyan hover:bg-hyundai-navy text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-all shadow-lg shadow-industrial-cyan/20"
             >
               {isAdding ? 'Cancelar' : <><Plus className="w-5 h-5" /> Nuevo Proyecto</>}
@@ -154,7 +200,7 @@ export default function Dashboard() {
             animate={{ opacity: 1, scale: 1 }}
             className="bg-white rounded-3xl shadow-xl p-8 border border-slate-100 mb-12"
           >
-            <h2 className="font-display font-bold text-2xl mb-8">Crear Nuevo Proyecto</h2>
+            <h2 className="font-display font-bold text-2xl mb-8">{isEditMode ? 'Editar Proyecto' : 'Crear Nuevo Proyecto'}</h2>
             <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">
                 <div>
@@ -184,8 +230,8 @@ export default function Dashboard() {
                   <div className="flex items-center gap-4">
                     <label className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-slate-50 border-2 border-dashed border-slate-300 rounded-xl cursor-pointer hover:bg-slate-100 transition-all text-slate-500">
                       <Upload className="w-5 h-5" />
-                      {mainImage ? mainImage.name : 'Subir Imagen'}
-                      <input type="file" onChange={handleImageChange} className="hidden" accept="image/*" required />
+                      {mainImage ? mainImage.name : (isEditMode ? 'Reemplazar Imagen' : 'Subir Imagen')}
+                      <input type="file" onChange={handleImageChange} className="hidden" accept="image/*" required={!isEditMode} />
                     </label>
                   </div>
                 </div>
@@ -194,8 +240,8 @@ export default function Dashboard() {
                   <div className="flex items-center gap-4">
                     <label className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-slate-50 border-2 border-dashed border-slate-300 rounded-xl cursor-pointer hover:bg-slate-100 transition-all text-slate-500">
                       <Upload className="w-5 h-5" />
-                      {galleryImages.length > 0 ? `${galleryImages.length} imagen(es) seleccionada(s)` : 'Subir Imágenes'}
-                      <input type="file" onChange={handleGalleryChange} className="hidden" accept="image/*" multiple required />
+                      {galleryImages.length > 0 ? `${galleryImages.length} imagen(es) seleccionada(s)` : (isEditMode ? 'Reemplazar Galería' : 'Subir Imágenes')}
+                      <input type="file" onChange={handleGalleryChange} className="hidden" accept="image/*" multiple required={!isEditMode} />
                     </label>
                   </div>
                 </div>
@@ -215,7 +261,7 @@ export default function Dashboard() {
                     disabled={uploading}
                     className="w-full bg-hyundai-navy hover:bg-carbon text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-xl disabled:opacity-70"
                   >
-                    {uploading ? <Loader2 className="w-5 h-5 animate-spin" /> : <><CheckCircle className="w-5 h-5" /> Guardar Proyecto</>}
+                    {uploading ? <Loader2 className="w-5 h-5 animate-spin" /> : <><CheckCircle className="w-5 h-5" /> {isEditMode ? 'Guardar Cambios' : 'Guardar Proyecto'}</>}
                   </button>
                 </div>
               </div>
@@ -237,7 +283,24 @@ export default function Dashboard() {
                   ) : (
                     <div className="flex items-center justify-center h-full text-slate-400">Sin imagen</div>
                   )}
+                  {project.is_hidden && (
+                    <div className="absolute left-4 top-4 bg-carbon/80 text-white text-xs font-mono px-3 py-1 rounded-full border border-white/10">
+                      Oculto
+                    </div>
+                  )}
                   <div className="absolute top-4 right-4 flex gap-2">
+                    <button
+                      onClick={() => openEdit(project)}
+                      className="p-2 bg-white/90 hover:bg-hyundai-navy hover:text-white text-slate-700 rounded-lg shadow-sm transition-all"
+                    >
+                      <Pencil className="w-5 h-5" />
+                    </button>
+                    <button
+                      onClick={() => handleToggleHidden(project)}
+                      className="p-2 bg-white/90 hover:bg-carbon hover:text-white text-slate-700 rounded-lg shadow-sm transition-all"
+                    >
+                      {project.is_hidden ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
+                    </button>
                     <button 
                       onClick={() => handleDelete(project.id)}
                       className="p-2 bg-white/90 hover:bg-red-500 hover:text-white text-red-500 rounded-lg shadow-sm transition-all"

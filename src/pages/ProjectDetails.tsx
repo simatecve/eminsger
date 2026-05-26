@@ -18,7 +18,7 @@ export default function ProjectDetails() {
         .eq('id', id)
         .single();
       
-      if (data) setProject(data);
+      if (data && !data.is_hidden) setProject(data);
       setLoading(false);
     }
     fetchProject();
