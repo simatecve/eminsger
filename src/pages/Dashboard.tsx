@@ -145,6 +145,8 @@ export default function Dashboard() {
     if (!error) {
       closeForm();
       fetchProjects();
+    } else {
+      alert(error.message || 'Error guardando el proyecto.');
     }
     setUploading(false);
   };
@@ -155,12 +157,14 @@ export default function Dashboard() {
       .update({ is_hidden: !project.is_hidden })
       .match({ id: project.id });
     if (!error) fetchProjects();
+    else alert(error.message || 'Error actualizando el estado del proyecto.');
   };
 
   const handleDelete = async (id: string) => {
     if (confirm('¿Eliminar este proyecto permanentemente?')) {
       const { error } = await insforge.database.from('projects').delete().match({ id });
       if (!error) fetchProjects();
+      else alert(error.message || 'Error eliminando el proyecto.');
     }
   };
 
