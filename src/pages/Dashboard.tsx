@@ -57,6 +57,35 @@ export default function Dashboard() {
     }
   };
 
+  const rehydrateAccessTokenFromStorage = () => {
+    try {
+      const raw = window.localStorage.getItem('insforge_session');
+      if (!raw) return;
+      const parsed = JSON.parse(raw);
+      const accessToken = parsed?.accessToken;
+      const userFromStorage = parsed?.user;
+      if (typeof accessToken === 'string') {
+        insforge.setAccessToken(accessToken);
+      }
+      if (userFromStorage) {
+        (insforge as any).tokenManager?.setUser?.(userFromStorage);
+      }
+    } catch {
+    }
+  };
+
+  const randomId = () => {
+    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+      return crypto.randomUUID();
+    }
+    return `${Math.random().toString(16).slice(2)}${Date.now().toString(16)}`;
+  };
+
+  const makeUploadKey = (prefix: string, kind: string, file: File) => {
+    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+    return `${prefix}/${kind}-${randomId()}-${safeName}`;
+  };
+
   const openCreate = () => {
     setEditingProject(null);
     setFormData({ title: '', year: '', location: '', description: '', client: '', duration: '', scope: '' });
@@ -91,16 +120,20 @@ export default function Dashboard() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isEditMode && !mainImage) {
+    const existingMainImage = typeof editingProject?.main_image === 'string' ? editingProject.main_image : '';
+    const existingGallery = Array.isArray(editingProject?.gallery) ? editingProject.gallery : [];
+
+    if (!mainImage && !existingMainImage) {
       alert('Selecciona una imagen principal.');
       return;
     }
-    if (!isEditMode && galleryImages.length === 0) {
+    if (galleryImages.length === 0 && existingGallery.length === 0) {
       alert('Selecciona al menos una imagen para la galería.');
       return;
     }
     setUploading(true);
 
+    rehydrateAccessTokenFromStorage();
     const { data: currentUserData, error: currentUserError } = await insforge.auth.getCurrentUser();
     if (currentUserError || !currentUserData?.user) {
       alert('Tu sesión expiró. Vuelve a iniciar sesión para subir imágenes.');
@@ -108,11 +141,13 @@ export default function Dashboard() {
       return;
     }
 
+    const uploadPrefix = isEditMode ? `projects/${editingProject!.id}` : `projects/${Date.now()}-${randomId()}`;
+
     let imageUrl = editingProject?.main_image ?? '';
     if (mainImage) {
       const { data: uploadData, error: uploadError } = await insforge.storage
         .from('project-images')
-        .upload(`${Date.now()}-${mainImage.name}`, mainImage);
+        .upload(makeUploadKey(uploadPrefix, 'main', mainImage), mainImage);
       if (uploadError || !uploadData) {
         alert(`Error subiendo la imagen principal${uploadError?.message ? `: ${uploadError.message}` : '.'}`);
         setUploading(false);
@@ -127,7 +162,7 @@ export default function Dashboard() {
       for (const file of galleryImages) {
         const { data, error } = await insforge.storage
           .from('project-images')
-          .upload(`${Date.now()}-${Math.random().toString(16).slice(2)}-${file.name}`, file);
+          .upload(makeUploadKey(uploadPrefix, 'gallery', file), file);
         if (error || !data) {
           alert(`Error subiendo la galería (${file.name})${error?.message ? `: ${error.message}` : '.'}`);
           setUploading(false);

@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { insforge } from '../lib/insforge';
 import { motion } from 'motion/react';
 import { Mail, Lock, ArrowRight, Loader2 } from 'lucide-react';
@@ -9,7 +8,6 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,6 +23,33 @@ export default function Login() {
       setError('Credenciales inválidas. Por favor intente de nuevo.');
       setLoading(false);
     } else {
+      const anyData = data as any;
+      const accessToken =
+        anyData?.accessToken ??
+        anyData?.access_token ??
+        anyData?.token ??
+        anyData?.session?.access_token ??
+        anyData?.session?.accessToken ??
+        anyData?.session?.token;
+      const user = anyData?.user ?? anyData?.session?.user ?? anyData?.session?.data?.user;
+      const tokenManager = (insforge as any).tokenManager;
+      const accessTokenFromClient =
+        tokenManager?.accessToken ?? tokenManager?.getAccessToken?.() ?? tokenManager?.getToken?.();
+      const userFromClient = tokenManager?.user ?? tokenManager?.getUser?.();
+      const finalAccessToken = typeof accessToken === 'string' ? accessToken : accessTokenFromClient;
+      const finalUser = user ?? userFromClient;
+
+      if (typeof finalAccessToken === 'string' && finalUser) {
+        try {
+          window.localStorage.setItem(
+            'insforge_session',
+            JSON.stringify({ accessToken: finalAccessToken, user: finalUser }),
+          );
+        } catch {
+        }
+        insforge.setAccessToken(finalAccessToken);
+        (insforge as any).tokenManager?.setUser?.(finalUser);
+      }
       window.location.href = '/dashboard';
     }
   };

@@ -11,3 +11,19 @@ export const insforge = createClient({
   baseUrl,
   anonKey,
 });
+
+try {
+  if (typeof window !== 'undefined') {
+    const raw = window.localStorage.getItem('insforge_session');
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      const accessToken = parsed?.accessToken;
+      const user = parsed?.user;
+      if (typeof accessToken === 'string' && user) {
+        insforge.setAccessToken(accessToken);
+        (insforge as any).tokenManager?.setUser?.(user);
+      }
+    }
+  }
+} catch {
+}

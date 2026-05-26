@@ -16,8 +16,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     const initAuth = async () => {
       const { data, error } = await insforge.auth.getCurrentUser();
-      if (data) {
-        setUser(data);
+      if (!error && data?.user) {
+        setUser(data.user);
+      } else {
+        setUser(null);
       }
       setLoading(false);
     };
@@ -27,6 +29,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signOut = async () => {
     await insforge.auth.signOut();
+    try {
+      window.localStorage.removeItem('insforge_session');
+    } catch {
+    }
+    insforge.setAccessToken(null);
     setUser(null);
   };
 
