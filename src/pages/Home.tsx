@@ -23,7 +23,7 @@ export default function Home() {
             playsInline
             className="w-full h-full object-cover"
           >
-            <source src="https://res.cloudinary.com/dah8wmc2g/video/upload/v1775762580/Engineer_in_turbine_202604091420_btdack.mp4" type="video/mp4" />
+            <source src="https://res.cloudinary.com/dah8wmc2g/video/upload/v1779827344/Hyundai_generator_assembling_in___202605261528_r2ekan.mp4" type="video/mp4" />
           </video>
           <div className="absolute inset-0 bg-gradient-to-tr from-hyundai-navy/80 via-carbon/70 to-industrial-cyan/40 mix-blend-multiply" />
           <div className="absolute inset-0 bg-gradient-to-t from-carbon via-transparent to-transparent" />
