@@ -6,8 +6,31 @@ import DiagnosticDeck from '../components/DiagnosticDeck';
 import FeaturesSection from '../components/FeaturesSection';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
 
 export default function Home() {
+  const heroVideos = [
+    'https://res.cloudinary.com/dah8wmc2g/video/upload/v1779827344/Hyundai_generator_assembling_in___202605261528_r2ekan.mp4',
+    'https://res.cloudinary.com/dah8wmc2g/video/upload/v1779828611/9294c057-58f2-4914-9a90-c8cfc950cc62_1_kowryd.mp4',
+  ];
+
+  const [heroVideoIndex, setHeroVideoIndex] = useState(0);
+  const heroVideoRef = useRef<HTMLVideoElement | null>(null);
+
+  useEffect(() => {
+    const video = heroVideoRef.current;
+    if (!video) return;
+    video.load();
+    const playPromise = video.play();
+    if (playPromise && typeof playPromise.catch === 'function') {
+      playPromise.catch(() => {});
+    }
+  }, [heroVideoIndex]);
+
+  const handleHeroVideoEnded = () => {
+    setHeroVideoIndex((prev) => (prev + 1) % heroVideos.length);
+  };
+
   return (
     <>
       <FloatingDashboard />
@@ -17,13 +40,15 @@ export default function Home() {
         {/* Background */}
         <div className="absolute inset-0 z-0">
           <video 
+            ref={heroVideoRef}
             autoPlay 
-            loop 
             muted 
             playsInline
+            preload="auto"
+            onEnded={handleHeroVideoEnded}
             className="w-full h-full object-cover"
           >
-            <source src="https://res.cloudinary.com/dah8wmc2g/video/upload/v1779827344/Hyundai_generator_assembling_in___202605261528_r2ekan.mp4" type="video/mp4" />
+            <source src={heroVideos[heroVideoIndex]} type="video/mp4" />
           </video>
           <div className="absolute inset-0 bg-gradient-to-tr from-hyundai-navy/80 via-carbon/70 to-industrial-cyan/40 mix-blend-multiply" />
           <div className="absolute inset-0 bg-gradient-to-t from-carbon via-transparent to-transparent" />
