@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Linkedin, Mail, MapPin, Phone } from 'lucide-react';
-import logo1 from '../logo1.jpeg';
+import logo2 from '../logo2.png';
 
 export default function Footer() {
   return (
@@ -9,7 +9,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center gap-2 mb-6">
-              <img src={logo1} alt="One World Group Emingser Logo" className="h-10 object-contain" />
+              <img src={logo2} alt="One World Group Emingser Logo" className="h-10 object-contain" />
             </div>
             <p className="text-slate-600 font-sans leading-relaxed max-w-md mb-6">
               Soluciones integrales de ingeniería diseñadas para optimizar, proteger y potenciar la infraestructura crítica de su empresa con los más altos estándares de calidad.

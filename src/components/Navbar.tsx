@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Linkedin, Mail, ArrowRight, Menu, X } from 'lucide-react';
 import { clsx } from 'clsx';
 import { Link, useLocation } from 'react-router-dom';
-import logo1 from '../logo1.jpeg';
+import logo2 from '../logo2.png';
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -43,7 +43,7 @@ export default function Navbar() {
         <Link to="/" className="flex items-center gap-4 z-50">
           <div className="rounded px-2 flex items-center justify-center">
             <img 
-              src={logo1} 
+              src={logo2} 
               alt="One World Group Emingser Logo" 
               className="h-25 object-contain"
               onError={(e) => {
