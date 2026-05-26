@@ -69,25 +69,26 @@ export default function Dashboard() {
     let imageUrl = '';
     if (mainImage) {
       const { data: uploadData, error: uploadError } = await insforge.storage.from('project-images').upload(`${Date.now()}-${mainImage.name}`, mainImage);
-      if (uploadData) {
-        imageUrl = insforge.storage.from('project-images').getPublicUrl(uploadData.key);
+      if (uploadError || !uploadData) {
+        alert(`Error subiendo la imagen principal${uploadError?.message ? `: ${uploadError.message}` : '.'}`);
+        setUploading(false);
+        return;
       }
+      imageUrl = insforge.storage.from('project-images').getPublicUrl(uploadData.key);
     }
 
     const galleryUrls: string[] = [];
     if (galleryImages.length > 0) {
-      const uploads = await Promise.all(
-        galleryImages.map((file) =>
-          insforge.storage
-            .from('project-images')
-            .upload(`${Date.now()}-${Math.random().toString(16).slice(2)}-${file.name}`, file)
-        )
-      );
-
-      for (const result of uploads) {
-        if (result.data) {
-          galleryUrls.push(insforge.storage.from('project-images').getPublicUrl(result.data.key));
+      for (const file of galleryImages) {
+        const { data, error } = await insforge.storage
+          .from('project-images')
+          .upload(`${Date.now()}-${Math.random().toString(16).slice(2)}-${file.name}`, file);
+        if (error || !data) {
+          alert(`Error subiendo la galería (${file.name})${error?.message ? `: ${error.message}` : '.'}`);
+          setUploading(false);
+          return;
         }
+        galleryUrls.push(insforge.storage.from('project-images').getPublicUrl(data.key));
       }
     }
 
