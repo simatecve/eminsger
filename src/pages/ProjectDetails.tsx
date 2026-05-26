@@ -85,7 +85,13 @@ export default function ProjectDetails() {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="rounded-3xl overflow-hidden aspect-[21/9] mb-16 relative shadow-2xl"
         >
-        <img src={project.main_image} alt={project.title} className="w-full h-full object-cover" />
+        {project.main_image ? (
+          <img src={project.main_image} alt={project.title} className="w-full h-full object-cover" />
+        ) : (
+          <div className="w-full h-full bg-slate-200 flex items-center justify-center text-slate-400">
+            Sin imagen principal
+          </div>
+        )}
         <div className="absolute inset-0 bg-gradient-to-tr from-hyundai-navy/40 to-transparent mix-blend-multiply" />
       </motion.div>
 

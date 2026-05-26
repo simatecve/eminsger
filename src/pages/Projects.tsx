@@ -60,8 +60,8 @@ export default function Projects() {
                   className="group relative rounded-3xl overflow-hidden glass-panel border border-white/10 aspect-[4/3] cursor-pointer"
                 >
                   <div 
-                    className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
-                    style={{ backgroundImage: `url(${project.main_image})` }}
+                    className="absolute inset-0 bg-slate-800 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
+                    style={project.main_image ? { backgroundImage: `url(${project.main_image})` } : undefined}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-carbon via-carbon/40 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-500" />
                   
