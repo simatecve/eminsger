@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { insforge } from '../lib/insforge';
+import { clearInsforgeSession, insforge } from '../lib/insforge';
 
 interface AuthContextType {
   user: any;
@@ -29,11 +29,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signOut = async () => {
     await insforge.auth.signOut();
-    try {
-      window.localStorage.removeItem('insforge_session');
-    } catch {
-    }
-    insforge.setAccessToken(null);
+    clearInsforgeSession();
     setUser(null);
   };
 

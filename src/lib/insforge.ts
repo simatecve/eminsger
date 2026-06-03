@@ -12,18 +12,30 @@ export const insforge = createClient({
   anonKey,
 });
 
-try {
+export const restoreInsforgeSession = () => {
   if (typeof window !== 'undefined') {
     const raw = window.localStorage.getItem('insforge_session');
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      const accessToken = parsed?.accessToken;
-      const user = parsed?.user;
-      if (typeof accessToken === 'string' && user) {
-        insforge.setAccessToken(accessToken);
-        (insforge as any).tokenManager?.setUser?.(user);
-      }
+    if (!raw) return;
+    const parsed = JSON.parse(raw);
+    const accessToken = parsed?.accessToken;
+    const user = parsed?.user;
+    if (typeof accessToken === 'string' && user) {
+      insforge.setAccessToken(accessToken);
+      (insforge as any).tokenManager?.setUser?.(user);
     }
   }
+};
+
+export const clearInsforgeSession = () => {
+  try {
+    if (typeof window !== 'undefined') window.localStorage.removeItem('insforge_session');
+  } catch {
+  }
+  insforge.setAccessToken(null);
+  (insforge as any).tokenManager?.setUser?.(null);
+};
+
+try {
+  restoreInsforgeSession();
 } catch {
 }

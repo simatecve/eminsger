@@ -201,7 +201,10 @@ export default function CmsManager() {
     setSavingKey(`${block.section}:${block.item_key}`);
     setError('');
     const { error: saveError } = await saveCmsBlock(block);
-    if (saveError) setError(saveError.message || 'No se pudo guardar el contenido.');
+    if (saveError) {
+      setError(saveError.message || 'No se pudo guardar el contenido.');
+      if (saveError.message?.toLowerCase().includes('sesion expirada')) window.location.href = '/login';
+    }
     await load();
     setSavingKey('');
   };
@@ -210,7 +213,10 @@ export default function CmsManager() {
     if (!confirm('Eliminar este contenido del CMS?')) return;
     setSavingKey(`${block.section}:${block.item_key}`);
     const { error: deleteError } = await deleteCmsBlock(block);
-    if (deleteError) setError(deleteError.message || 'No se pudo eliminar el contenido.');
+    if (deleteError) {
+      setError(deleteError.message || 'No se pudo eliminar el contenido.');
+      if (deleteError.message?.toLowerCase().includes('sesion expirada')) window.location.href = '/login';
+    }
     await load();
     setSavingKey('');
   };
@@ -219,7 +225,10 @@ export default function CmsManager() {
     if (!file) return;
     setSavingKey(`${block.section}:${block.item_key}`);
     const { url, error: uploadError } = await uploadCmsAsset(file);
-    if (uploadError) setError(uploadError.message || 'No se pudo subir el archivo.');
+    if (uploadError) {
+      setError(uploadError.message || 'No se pudo subir el archivo.');
+      if (uploadError.message?.toLowerCase().includes('sesion expirada')) window.location.href = '/login';
+    }
     if (url) updateContent(block, field, url);
     setSavingKey('');
   };

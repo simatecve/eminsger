@@ -1,10 +1,12 @@
-import { insforge } from './insforge';
+import { clearInsforgeSession, insforge, restoreInsforgeSession } from './insforge';
 import { cmsDefaults, type CmsBlock } from '../data/cmsDefaults';
 
 export type CmsDraft = Omit<CmsBlock, 'id'> & { id?: string };
 
 const TABLE = 'cms_content_blocks';
 const BUCKET = 'cms-assets';
+
+const sessionError = new Error('Sesion expirada. Vuelve a iniciar sesion para guardar cambios.');
 
 const asBlock = (row: any): CmsBlock => ({
   id: row.id,
@@ -49,6 +51,13 @@ export function getCmsItems(blocks: CmsBlock[], section: string) {
 }
 
 export async function saveCmsBlock(block: CmsDraft) {
+  restoreInsforgeSession();
+  const { data: currentUserData, error: currentUserError } = await insforge.auth.getCurrentUser();
+  if (currentUserError || !currentUserData?.user) {
+    clearInsforgeSession();
+    return { data: null, error: sessionError };
+  }
+
   const payload = {
     section: block.section,
     item_key: block.item_key,
@@ -77,6 +86,13 @@ export async function saveCmsBlock(block: CmsDraft) {
 }
 
 export async function deleteCmsBlock(block: CmsBlock) {
+  restoreInsforgeSession();
+  const { data: currentUserData, error: currentUserError } = await insforge.auth.getCurrentUser();
+  if (currentUserError || !currentUserData?.user) {
+    clearInsforgeSession();
+    return { data: null, error: sessionError };
+  }
+
   if (!block.id) {
     return saveCmsBlock({ ...block, is_hidden: true });
   }
@@ -84,6 +100,13 @@ export async function deleteCmsBlock(block: CmsBlock) {
 }
 
 export async function uploadCmsAsset(file: File) {
+  restoreInsforgeSession();
+  const { data: currentUserData, error: currentUserError } = await insforge.auth.getCurrentUser();
+  if (currentUserError || !currentUserData?.user) {
+    clearInsforgeSession();
+    return { url: '', key: '', error: sessionError };
+  }
+
   const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
   const key = `cms/${Date.now()}-${crypto.randomUUID()}-${safeName}`;
   const { data, error } = await insforge.storage.from(BUCKET).upload(key, file);

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { insforge } from '../lib/insforge';
+import { clearInsforgeSession, insforge } from '../lib/insforge';
 import { motion } from 'motion/react';
 import { Mail, Lock, ArrowRight, Loader2 } from 'lucide-react';
 
@@ -13,6 +13,7 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
     setError('');
+    clearInsforgeSession();
 
     const { data, error } = await insforge.auth.signInWithPassword({
       email,
