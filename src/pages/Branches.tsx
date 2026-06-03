@@ -1,6 +1,7 @@
 import { motion } from 'motion/react';
 import { MapPin, Mail, Phone, User, Globe } from 'lucide-react';
 import { useEffect } from 'react';
+import { useCmsContent } from '../hooks/useCmsContent';
 
 const branches = [
   {
@@ -47,6 +48,11 @@ const branches = [
 ];
 
 export default function Branches() {
+  const cms = useCmsContent();
+  const header = cms.block('branches.header')?.content ?? {};
+  const cmsBranches = cms.items('branches.items').map((item) => item.content);
+  const visibleBranches = cmsBranches.length > 0 ? cmsBranches : branches;
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -64,10 +70,10 @@ export default function Branches() {
             className="text-center"
           >
             <h1 className="font-display font-bold text-5xl md:text-7xl mb-6 text-white tracking-tight">
-              Nuestras <span className="font-serif italic text-industrial-cyan">Sucursales</span>
+              {header.title || 'Nuestras Sucursales'}
             </h1>
             <p className="font-sans text-xl text-white/80 max-w-3xl mx-auto leading-relaxed">
-              Presencia internacional para brindar soporte técnico y soluciones de ingeniería de clase mundial en toda la región.
+              {header.description || 'Presencia internacional para brindar soporte tecnico y soluciones de ingenieria de clase mundial en toda la region.'}
             </p>
           </motion.div>
         </div>
@@ -76,7 +82,7 @@ export default function Branches() {
       {/* Content */}
       <section className="py-24 px-6 md:px-12 lg:px-24 max-w-7xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {branches.map((branch, index) => (
+          {visibleBranches.map((branch, index) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, y: 30 }}
@@ -105,14 +111,14 @@ export default function Branches() {
                 
                 <div className="flex items-center gap-3">
                   <Mail className="w-5 h-5 text-industrial-cyan shrink-0" />
-                  <a href={`mailto:${branch.email}`} className="hover:text-industrial-cyan transition-colors break-all">
+                  <a href={`mailto:${branch.email || ''}`} className="hover:text-industrial-cyan transition-colors break-all">
                     {branch.email}
                   </a>
                 </div>
                 
                 <div className="flex items-center gap-3">
                   <Phone className="w-5 h-5 text-industrial-cyan shrink-0" />
-                  <a href={`tel:${branch.phone.replace(/[^0-9+]/g, '')}`} className="hover:text-industrial-cyan transition-colors">
+                  <a href={`tel:${(branch.phone || '').replace(/[^0-9+]/g, '')}`} className="hover:text-industrial-cyan transition-colors">
                     {branch.phone}
                   </a>
                 </div>

@@ -2,9 +2,12 @@ import { useEffect } from 'react';
 import { motion } from 'motion/react';
 import { useLocation } from 'react-router-dom';
 import { Wrench, Factory, HardHat, CheckCircle2, Activity, Zap, ShieldCheck } from 'lucide-react';
+import { useCmsContent } from '../hooks/useCmsContent';
 
 export default function Services() {
   const location = useLocation();
+  const cms = useCmsContent();
+  const header = cms.block('services.header')?.content ?? {};
 
   useEffect(() => {
     if (location.hash) {
@@ -71,6 +74,12 @@ export default function Services() {
       ]
     }
   ];
+  const serviceIcons = [Wrench, Factory, HardHat];
+  const cmsServices: any[] = cms.items('services.items').map((item, index) => ({
+    ...item.content,
+    icon: serviceIcons[index % serviceIcons.length],
+  }));
+  const visibleServices: any[] = cmsServices.length > 0 ? cmsServices : servicesData;
 
   return (
     <>
@@ -85,13 +94,13 @@ export default function Services() {
           >
             <div className="flex items-center gap-3 mb-4">
               <Activity className="w-6 h-6 text-industrial-cyan" />
-              <span className="font-mono text-sm tracking-widest text-industrial-cyan uppercase">Catálogo de Soluciones</span>
+              <span className="font-mono text-sm tracking-widest text-industrial-cyan uppercase">{header.eyebrow || 'Catalogo de Soluciones'}</span>
             </div>
             <h1 className="font-display font-bold text-5xl md:text-7xl mb-6 text-white tracking-tight">
-              Nuestros <span className="font-serif italic text-industrial-cyan">Servicios</span>
+              {header.title || 'Nuestros Servicios'}
             </h1>
             <p className="font-sans text-xl text-white/80 max-w-3xl leading-relaxed">
-              Soluciones integrales de ingeniería diseñadas para optimizar, proteger y potenciar la infraestructura crítica de su empresa con los más altos estándares de calidad.
+              {header.description || 'Soluciones integrales de ingenieria disenadas para optimizar, proteger y potenciar la infraestructura critica de su empresa con los mas altos estandares de calidad.'}
             </p>
           </motion.div>
         </div>
@@ -100,7 +109,7 @@ export default function Services() {
       <section className="py-24 px-6 md:px-12 lg:px-24 max-w-7xl mx-auto">
         {/* Services List */}
       <div className="space-y-16">
-        {servicesData.map((service, index) => (
+        {visibleServices.map((service, index) => (
           <motion.div 
             key={service.id}
             id={service.id}
@@ -125,7 +134,7 @@ export default function Services() {
                 </h2>
                 
                 <div className="space-y-4 mb-8">
-                  {service.descriptions.map((desc, i) => (
+                  {(service.descriptions ?? []).map((desc: string, i: number) => (
                     <p key={i} className="font-sans text-slate-600 leading-relaxed text-lg">
                       {desc}
                     </p>
@@ -143,7 +152,7 @@ export default function Services() {
                 </div>
                 
                 <ul className="space-y-4">
-                  {service.list.map((item, i) => (
+                  {(service.list ?? []).map((item: string, i: number) => (
                     <motion.li 
                       key={i}
                       initial={{ opacity: 0, x: 20 }}

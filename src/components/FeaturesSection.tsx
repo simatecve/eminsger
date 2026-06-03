@@ -25,7 +25,27 @@ const features = [
   }
 ];
 
-export default function FeaturesSection() {
+const featureIcons = [Star, Truck, HandCoins, Award];
+
+type FeaturesSectionProps = {
+  intro?: {
+    title?: string;
+    bannerTitle?: string;
+    bannerDescription?: string;
+    bannerCta?: string;
+  };
+  items?: Array<{
+    title?: string;
+    description?: string;
+  }>;
+};
+
+export default function FeaturesSection({ intro = {}, items }: FeaturesSectionProps) {
+  const visibleFeatures = (items && items.length > 0 ? items : features).map((feature, index) => ({
+    ...feature,
+    icon: featureIcons[index % featureIcons.length],
+  }));
+
   return (
     <section className="py-24 px-6 md:px-12 lg:px-24 max-w-7xl mx-auto relative z-10">
       <div className="text-center mb-20">
@@ -35,12 +55,12 @@ export default function FeaturesSection() {
           viewport={{ once: true }}
           className="font-display font-bold text-3xl md:text-4xl lg:text-5xl text-carbon max-w-4xl mx-auto leading-tight"
         >
-          En Group Emingser nos caracterizamos por ofrecer a nuestros clientes
+          {intro.title || 'En Group Emingser nos caracterizamos por ofrecer a nuestros clientes'}
         </motion.h2>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-24">
-        {features.map((feature, index) => (
+        {visibleFeatures.map((feature, index) => (
           <motion.div 
             key={index}
             initial={{ opacity: 0, y: 30 }}
@@ -74,16 +94,16 @@ export default function FeaturesSection() {
         
         <div className="relative z-10 md:w-2/3">
           <h3 className="font-display font-bold text-3xl text-carbon mb-4">
-            Group Emingser Internacional
+            {intro.bannerTitle || 'Group Emingser Internacional'}
           </h3>
           <p className="font-sans text-slate-600 text-lg leading-relaxed">
-            En <strong className="text-carbon font-semibold">Group Emingser</strong> ofrecemos servicios a nivel internacional, nos encontramos ubicado América del Norte, El Caribe y América del Sur.
+            {intro.bannerDescription || 'En Group Emingser ofrecemos servicios a nivel internacional, nos encontramos ubicado America del Norte, El Caribe y America del Sur.'}
           </p>
         </div>
         
         <div className="relative z-10 md:w-1/3 flex justify-end w-full">
           <Link to="/sucursales" className="inline-block w-full md:w-auto text-center px-8 py-4 bg-industrial-cyan hover:bg-industrial-cyan/80 text-white font-bold rounded-full transition-colors shadow-[0_0_20px_rgba(14,165,233,0.4)] hover:shadow-[0_0_30px_rgba(14,165,233,0.6)]">
-            Sucursales
+            {intro.bannerCta || 'Sucursales'}
           </Link>
         </div>
       </motion.div>

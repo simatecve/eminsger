@@ -1,20 +1,21 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 
-const messages = [
+const defaultMessages = [
   "Escaneando sistema eléctrico...",
   "Calculando carga térmica...",
   "Optimizando parámetros de red...",
   "Verificando protocolos de seguridad..."
 ];
 
-export default function StatusTerminal() {
+export default function StatusTerminal({ messages = defaultMessages }: { messages?: string[] }) {
   const [text, setText] = useState('');
   const [msgIndex, setMsgIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
-    const currentMsg = messages[msgIndex];
+    if (messages.length === 0) return;
+    const currentMsg = messages[msgIndex] ?? messages[0] ?? '';
     let timeout: NodeJS.Timeout;
 
     if (isDeleting) {
@@ -35,7 +36,7 @@ export default function StatusTerminal() {
     }
 
     return () => clearTimeout(timeout);
-  }, [text, isDeleting, msgIndex]);
+  }, [text, isDeleting, msgIndex, messages]);
 
   return (
     <div className="flex flex-wrap items-center gap-3 font-mono text-sm">

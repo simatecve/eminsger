@@ -3,8 +3,11 @@ import { Link } from 'react-router-dom';
 import { MapPin, Calendar, Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { insforge } from '../lib/insforge';
+import { useCmsContent } from '../hooks/useCmsContent';
 
 export default function Projects() {
+  const cms = useCmsContent();
+  const header = cms.block('projects.header')?.content ?? {};
   const [projects, setProjects] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -35,10 +38,10 @@ export default function Projects() {
             className="text-center"
           >
             <h1 className="font-display font-bold text-5xl md:text-7xl mb-6 text-white tracking-tight">
-              Nuestros <span className="font-serif italic text-industrial-cyan">Proyectos</span>
+              {header.title || 'Nuestros Proyectos'}
             </h1>
             <p className="font-sans text-xl text-white/80 max-w-3xl mx-auto leading-relaxed">
-              Un portafolio de excelencia en ingeniería. Descubra cómo hemos transformado la infraestructura industrial a través de soluciones innovadoras y ejecución precisa.
+              {header.description || 'Un portafolio de excelencia en ingenieria. Descubra como hemos transformado la infraestructura industrial a traves de soluciones innovadoras y ejecucion precisa.'}
             </p>
           </motion.div>
         </div>
@@ -90,7 +93,7 @@ export default function Projects() {
           </div>
         ) : (
           <div className="text-center py-20 text-slate-400 font-sans text-lg">
-            No se encontraron proyectos publicados actualmente.
+            {header.emptyText || 'No se encontraron proyectos publicados actualmente.'}
           </div>
         )}
       </section>

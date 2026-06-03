@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { motion } from 'motion/react';
 import { Plus, Trash2, LayoutDashboard, LogOut, Upload, Loader2, CheckCircle, Pencil, Eye, EyeOff } from 'lucide-react';
 import { Navigate } from 'react-router-dom';
+import CmsManager from '../components/CmsManager';
 
 export default function Dashboard() {
   const { user, loading: authLoading, signOut } = useAuth();
@@ -12,6 +13,7 @@ export default function Dashboard() {
   const [isAdding, setIsAdding] = useState(false);
   const [editingProject, setEditingProject] = useState<any | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [activePanel, setActivePanel] = useState<'projects' | 'cms'>('projects');
 
   // Form state
   const [formData, setFormData] = useState({
@@ -225,12 +227,14 @@ export default function Dashboard() {
             <p className="text-slate-500 mt-2">Gestiona los proyectos que se muestran en la web.</p>
           </div>
           <div className="flex items-center gap-4">
-            <button 
-              onClick={() => (isAdding ? closeForm() : openCreate())}
-              className="bg-industrial-cyan hover:bg-hyundai-navy text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-all shadow-lg shadow-industrial-cyan/20"
-            >
-              {isAdding ? 'Cancelar' : <><Plus className="w-5 h-5" /> Nuevo Proyecto</>}
-            </button>
+            {activePanel === 'projects' && (
+              <button
+                onClick={() => (isAdding ? closeForm() : openCreate())}
+                className="bg-industrial-cyan hover:bg-hyundai-navy text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-all shadow-lg shadow-industrial-cyan/20"
+              >
+                {isAdding ? 'Cancelar' : <><Plus className="w-5 h-5" /> Nuevo Proyecto</>}
+              </button>
+            )}
             <button 
               onClick={signOut}
               className="bg-white border border-slate-200 text-slate-600 hover:text-red-500 px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-all"
@@ -239,6 +243,26 @@ export default function Dashboard() {
             </button>
           </div>
         </header>
+
+        <div className="flex flex-wrap gap-2 mb-8">
+          <button
+            onClick={() => setActivePanel('projects')}
+            className={`px-5 py-3 rounded-xl font-bold transition-all ${activePanel === 'projects' ? 'bg-hyundai-navy text-white' : 'bg-white border border-slate-200 text-slate-600'}`}
+          >
+            Proyectos
+          </button>
+          <button
+            onClick={() => setActivePanel('cms')}
+            className={`px-5 py-3 rounded-xl font-bold transition-all ${activePanel === 'cms' ? 'bg-hyundai-navy text-white' : 'bg-white border border-slate-200 text-slate-600'}`}
+          >
+            CMS Web
+          </button>
+        </div>
+
+        {activePanel === 'cms' ? (
+          <CmsManager />
+        ) : (
+          <>
 
         {isAdding && (
           <motion.div 
@@ -371,6 +395,8 @@ export default function Dashboard() {
             </div>
           )}
         </div>
+          </>
+        )}
       </div>
     </div>
   );

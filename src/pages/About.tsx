@@ -1,7 +1,28 @@
 import { motion } from 'motion/react';
 import { Target, Eye, Award, Shield, Zap, Clock, Lightbulb } from 'lucide-react';
+import { useCmsContent } from '../hooks/useCmsContent';
 
 export default function About() {
+  const cms = useCmsContent();
+  const header = cms.block('about.header')?.content ?? {};
+  const cards = cms.items('about.cards').map((item) => item.content);
+  const valuesIntro = cms.block('about.valuesIntro')?.content ?? {};
+  const values = cms.items('about.values').map((item) => item.content.text).filter(Boolean);
+  const history = cms.block('about.history')?.content ?? {};
+  const defaultCards = [
+    {
+      title: 'Mision',
+      description:
+        'Reconocer a cada uno de nuestros clientes; la razon de ser de nuestra empresa, logrando de manera permanente la excelencia en la calidad de nuestros productos y servicios con la satisfaccion de quienes lo utilizan, respaldado por un personal capacitado y una infraestructura estable y confiable.',
+    },
+    {
+      title: 'Vision',
+      description: 'Ser una empresa lider en la prestacion de ingenieria y servicios. Ademas de ser preferidos por nuestros clientes a nivel nacional e internacional.',
+    },
+  ];
+  const visibleCards = cards.length > 0 ? cards : defaultCards;
+  const valueIcons = [Shield, Award, Clock, Lightbulb];
+
   return (
     <>
       {/* Dark Header */}
@@ -14,13 +35,13 @@ export default function About() {
             transition={{ duration: 0.8 }}
           >
             <h1 className="font-display font-bold text-5xl md:text-7xl mb-6 text-white tracking-tight">
-              Sobre <span className="font-serif italic text-industrial-cyan">Nosotros</span>
+              {header.title || 'Sobre Nosotros'}
             </h1>
             <p className="font-sans text-xl text-white/80 max-w-3xl leading-relaxed">
-              En Group Emingser protegemos la inversión de nuestros clientes, ejecutando trabajos de ingeniería y servicio de alta calidad en cada proyecto a realizar. Deseamos formar parte integral del éxito de nuestros clientes; por esta razón, brindamos soluciones prácticas que nos permitan cumplir con las metas establecidas en cada una de nuestras gestiones.
+              {header.paragraphs?.[0] || 'En Group Emingser protegemos la inversion de nuestros clientes, ejecutando trabajos de ingenieria y servicio de alta calidad en cada proyecto a realizar.'}
             </p>
             <p className="font-sans text-xl text-white/80 max-w-3xl leading-relaxed mt-6">
-              Además, ofrecemos servicios complementarios que agregan valor a nuestra propuesta, que se traducen en facilidades y ahorro en los costos de mantenimientos de nuestros clientes. El concepto de espíritu de excelencia es parte esencial de nuestro equipo Group Emingser.
+              {header.paragraphs?.[1] || 'Ademas, ofrecemos servicios complementarios que agregan valor a nuestra propuesta.'}
             </p>
           </motion.div>
         </div>
@@ -39,10 +60,10 @@ export default function About() {
             <Target className="w-32 h-32 text-industrial-cyan" />
           </div>
           <h2 className="font-display font-bold text-3xl mb-6 text-industrial-cyan flex items-center gap-3">
-            <Target className="w-8 h-8" /> Misión
+            <Target className="w-8 h-8" /> {visibleCards[0]?.title || 'Mision'}
           </h2>
           <p className="text-slate-600 leading-relaxed relative z-10">
-            Reconocer a cada uno de nuestros clientes; la razón de ser de nuestra empresa, logrando de manera permanente la excelencia en la calidad de nuestros productos y servicios con la satisfacción de quienes lo utilizan, respaldado por un personal capacitado y una infraestructura estable y confiable.
+            {visibleCards[0]?.description}
           </p>
         </motion.div>
 
@@ -56,36 +77,34 @@ export default function About() {
             <Eye className="w-32 h-32 text-industrial-cyan" />
           </div>
           <h2 className="font-display font-bold text-3xl mb-6 text-industrial-cyan flex items-center gap-3">
-            <Eye className="w-8 h-8" /> Visión
+            <Eye className="w-8 h-8" /> {visibleCards[1]?.title || 'Vision'}
           </h2>
           <p className="text-slate-600 leading-relaxed relative z-10">
-            Ser una empresa líder en la prestación de ingeniería y servicios. Además de ser preferidos por nuestros clientes a nivel nacional e internacional.
+            {visibleCards[1]?.description}
           </p>
         </motion.div>
       </div>
 
       {/* Valores & Slogan */}
       <div className="mb-20">
-        <h2 className="font-display font-bold text-4xl mb-10 text-center text-carbon">Nuestros Valores</h2>
+        <h2 className="font-display font-bold text-4xl mb-10 text-center text-carbon">{valuesIntro.title || 'Nuestros Valores'}</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {[
-            { icon: Shield, text: "Integridad" },
-            { icon: Award, text: "Calidad" },
-            { icon: Clock, text: "Responsabilidad" },
-            { icon: Lightbulb, text: "Innovación" }
-          ].map((valor, i) => (
-            <motion.div
-              key={valor.text}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-              className="glass-panel p-8 rounded-2xl flex flex-col items-center justify-center text-center group hover:bg-slate-100 transition-colors"
-            >
-              <valor.icon className="w-12 h-12 text-industrial-cyan mb-4 group-hover:scale-110 transition-transform" />
-              <span className="font-display font-semibold text-lg text-carbon">{valor.text}</span>
-            </motion.div>
-          ))}
+          {(values.length > 0 ? values : ['Integridad', 'Calidad', 'Responsabilidad', 'Innovacion']).map((text, i) => {
+            const ValorIcon = valueIcons[i % valueIcons.length];
+            return (
+              <motion.div
+                key={text}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="glass-panel p-8 rounded-2xl flex flex-col items-center justify-center text-center group hover:bg-slate-100 transition-colors"
+              >
+                <ValorIcon className="w-12 h-12 text-industrial-cyan mb-4 group-hover:scale-110 transition-transform" />
+                <span className="font-display font-semibold text-lg text-carbon">{text}</span>
+              </motion.div>
+            );
+          })}
         </div>
 
         <motion.div 
@@ -95,7 +114,7 @@ export default function About() {
           className="mt-12 text-center"
         >
           <p className="font-serif italic text-3xl md:text-4xl text-industrial-cyan">
-            "Pensar diferente y hacerlo simple mediante un método atractivo."
+            {valuesIntro.slogan ? `"${valuesIntro.slogan}"` : '"Pensar diferente y hacerlo simple mediante un metodo atractivo."'}
           </p>
         </motion.div>
       </div>
@@ -107,17 +126,11 @@ export default function About() {
         viewport={{ once: true }}
         className="glass-panel p-10 md:p-16 rounded-3xl"
       >
-        <h2 className="font-display font-bold text-4xl mb-8 text-carbon">Nuestra Historia</h2>
+        <h2 className="font-display font-bold text-4xl mb-8 text-carbon">{valuesIntro.historyTitle || 'Nuestra Historia'}</h2>
         <div className="space-y-6 text-slate-600 leading-relaxed font-sans text-lg">
-          <p>
-            Group Emingser fue fundada en marzo 2016 con el propósito de atender las necesidades de la industria relacionada principalmente con la construcción, instalaciones eléctricas, mantenimiento industrial especializado, desarrollo de ingeniería, montaje en estructuras metálicas, mantenimiento a subestaciones eléctricas, Mantenimiento a motores de combustión internas para los diferentes sectores (Generación eléctrica, construcción, minería, marítimo, entre otros).
-          </p>
-          <p>
-            En los inicios de nuestras operaciones, nos especializamos en la provisión de productos y servicios de ingeniería en centrales de generación eléctrica. En poco tiempo incorporamos nuevas líneas de servicio con el objetivo de proveer a nuestros clientes una solución integral a sus necesidades. Contando con un excelente grupo humano el cual se capacita de forma constante con el fin de estar actualizado en los cambios e innovaciones tecnológicas que se presentan en el mercado.
-          </p>
-          <p>
-            Nuestro objetivo principal es lograr una permanente mejora en nuestras actividades a fin de dar un servicio que asegure una entrega en tiempo y forma con su correspondiente asesoramiento y soporte técnico. La complementación de las normas y procedimientos aplicados, nos precisa a un estricto cumplimiento de nuestra garantía y calidad en los productos y servicios que ofrecemos para lograr como meta final una satisfacción plena de nuestros clientes.
-          </p>
+          {(history.paragraphs ?? []).map((paragraph: string, index: number) => (
+            <p key={index}>{paragraph}</p>
+          ))}
         </div>
       </motion.div>
       </section>

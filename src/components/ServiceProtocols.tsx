@@ -67,7 +67,25 @@ const protocols = [
   }
 ];
 
-export default function ServiceProtocols() {
+type ServiceProtocolsProps = {
+  intro?: {
+    title?: string;
+    description?: string;
+  };
+  items?: Array<{
+    title?: string;
+    content?: string;
+    bgImage?: string;
+    link?: string;
+  }>;
+};
+
+export default function ServiceProtocols({ intro = {}, items }: ServiceProtocolsProps) {
+  const visibleProtocols = (items && items.length > 0 ? items : protocols).map((protocol, index) => ({
+    ...protocols[index % protocols.length],
+    ...protocol,
+  }));
+
   return (
     <section className="py-24 px-6 md:px-12 lg:px-24 max-w-7xl mx-auto relative z-10">
       <div className="text-center mb-16">
@@ -77,7 +95,7 @@ export default function ServiceProtocols() {
           viewport={{ once: true }}
           className="font-display font-bold text-4xl md:text-5xl text-carbon mb-6 tracking-tight"
         >
-          Nuestras Especialidades
+          {intro.title || 'Nuestras Especialidades'}
         </motion.h2>
         <motion.p 
           initial={{ opacity: 0, y: 20 }}
@@ -86,12 +104,12 @@ export default function ServiceProtocols() {
           transition={{ delay: 0.1 }}
           className="text-slate-600 font-sans text-lg max-w-2xl mx-auto"
         >
-          Soluciones de ingeniería de alto nivel para la industria moderna, garantizando eficiencia y continuidad operativa.
+          {intro.description || 'Soluciones de ingenieria de alto nivel para la industria moderna, garantizando eficiencia y continuidad operativa.'}
         </motion.p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {protocols.map((protocol, i) => (
+        {visibleProtocols.map((protocol, i) => (
           <motion.div 
             key={i}
             initial={{ opacity: 0, y: 40 }}
@@ -130,7 +148,7 @@ export default function ServiceProtocols() {
               </div>
 
               <Link 
-                to={protocol.link} 
+                to={protocol.link || '/servicios'}
                 className="inline-flex items-center gap-2 text-industrial-cyan font-medium text-sm group/link mt-6"
               >
                 Explorar Servicio

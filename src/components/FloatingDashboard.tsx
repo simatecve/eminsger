@@ -2,7 +2,22 @@ import { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import { Activity, ShieldCheck } from 'lucide-react';
 
-export default function FloatingDashboard() {
+type FloatingDashboardContent = {
+  status?: string;
+  projectsLabel?: string;
+  projectsValue?: string;
+  mwLabel?: string;
+  mwValue?: string;
+  clientsLabel?: string;
+  clientsValue?: string;
+  efficiencyLabel?: string;
+  efficiencyValue?: string;
+  partnerTitle?: string;
+  partnerSubtitle?: string;
+  certification?: string;
+};
+
+export default function FloatingDashboard({ content = {} }: { content?: FloatingDashboardContent }) {
   const [time, setTime] = useState('');
   const [temp, setTemp] = useState(24.5);
   
@@ -29,20 +44,20 @@ export default function FloatingDashboard() {
 
     const interval = setInterval(() => {
       currentStep++;
-      setProjects(Math.floor((47 / steps) * currentStep));
-      setMw(Math.floor((1240 / steps) * currentStep));
-      setClients(Math.floor((120 / steps) * currentStep));
+      setProjects(Math.floor(((Number(content.projectsValue) || 47) / steps) * currentStep));
+      setMw(Math.floor(((Number(content.mwValue) || 1240) / steps) * currentStep));
+      setClients(Math.floor(((Number(content.clientsValue) || 120) / steps) * currentStep));
 
       if (currentStep >= steps) {
         clearInterval(interval);
-        setProjects(47);
-        setMw(1240);
-        setClients(120);
+        setProjects(Number(content.projectsValue) || 47);
+        setMw(Number(content.mwValue) || 1240);
+        setClients(Number(content.clientsValue) || 120);
       }
     }, stepTime);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [content.projectsValue, content.mwValue, content.clientsValue]);
 
   return (
     <>
@@ -55,7 +70,7 @@ export default function FloatingDashboard() {
       >
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_#22c55e]" />
-          <span className="text-white/80">ONLINE</span>
+          <span className="text-white/80">{content.status || 'ONLINE'}</span>
         </div>
         <div className="w-px h-4 bg-white/20" />
         <span className="text-industrial-cyan">{temp.toFixed(1)}°C</span>
@@ -77,23 +92,23 @@ export default function FloatingDashboard() {
         
         <div className="space-y-3 font-mono text-sm mb-4">
           <div className="flex justify-between">
-            <span className="text-white/60">Proyectos Activos</span>
+            <span className="text-white/60">{content.projectsLabel || 'Proyectos Activos'}</span>
             <span className="text-white">{projects}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-white/60">MW Instalados</span>
+            <span className="text-white/60">{content.mwLabel || 'MW Instalados'}</span>
             <span className="text-white">{mw}+</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-white/60">Clientes</span>
+            <span className="text-white/60">{content.clientsLabel || 'Clientes'}</span>
             <span className="text-white">{clients}+</span>
           </div>
         </div>
 
         <div className="space-y-1.5">
           <div className="flex justify-between text-[10px] font-mono text-white/60">
-            <span>Eficiencia del sistema</span>
-            <span className="text-industrial-cyan">98.7%</span>
+            <span>{content.efficiencyLabel || 'Eficiencia del sistema'}</span>
+            <span className="text-industrial-cyan">{content.efficiencyValue || '98.7%'}</span>
           </div>
           <div className="h-1 bg-white/10 rounded-full overflow-hidden">
             <motion.div 
@@ -117,12 +132,12 @@ export default function FloatingDashboard() {
           <span className="text-hyundai-navy font-bold text-xs">HMS</span>
         </div>
         <div className="flex flex-col">
-          <span className="text-xs font-semibold text-white">Hyundai Marine Solutions</span>
-          <span className="text-[10px] text-white/60">Partner Oficial Rep. Dom.</span>
+          <span className="text-xs font-semibold text-white">{content.partnerTitle || 'Hyundai Marine Solutions'}</span>
+          <span className="text-[10px] text-white/60">{content.partnerSubtitle || 'Partner Oficial Rep. Dom.'}</span>
         </div>
         <div className="ml-2 pl-3 border-l border-white/10 flex items-center gap-1.5">
           <ShieldCheck className="w-4 h-4 text-industrial-cyan" />
-          <span className="text-[10px] font-mono text-industrial-cyan">ISO 9001</span>
+          <span className="text-[10px] font-mono text-industrial-cyan">{content.certification || 'ISO 9001'}</span>
         </div>
       </motion.div>
     </>
