@@ -113,7 +113,7 @@ export const cmsDefaults: CmsBlock[] = [
     is_hidden: false,
     content: {
       type: 'video',
-      url: 'https://res.cloudinary.com/dah8wmc2g/video/upload/v1780592200/Video_of_electric_substation_202606032014_fo4y6p.mp4',
+      url: 'https://res.cloudinary.com/dah8wmc2g/video/upload/v1779827344/Hyundai_generator_assembling_in___202605261528_r2ekan.mp4',
     },
   },
   {
@@ -121,6 +121,28 @@ export const cmsDefaults: CmsBlock[] = [
     item_key: 'video-2',
     label: 'Video hero 2',
     sort_order: 1,
+    is_hidden: false,
+    content: {
+      type: 'video',
+      url: 'https://res.cloudinary.com/dah8wmc2g/video/upload/v1779828611/9294c057-58f2-4914-9a90-c8cfc950cc62_1_kowryd.mp4',
+    },
+  },
+  {
+    section: 'home.heroMedia',
+    item_key: 'video-3',
+    label: 'Video hero 3',
+    sort_order: 2,
+    is_hidden: false,
+    content: {
+      type: 'video',
+      url: 'https://res.cloudinary.com/dah8wmc2g/video/upload/v1780592200/Video_of_electric_substation_202606032014_fo4y6p.mp4',
+    },
+  },
+  {
+    section: 'home.heroMedia',
+    item_key: 'video-4',
+    label: 'Video hero 4',
+    sort_order: 3,
     is_hidden: false,
     content: {
       type: 'video',
