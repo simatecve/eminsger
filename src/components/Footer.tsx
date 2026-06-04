@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Linkedin, Mail, MapPin, Phone } from 'lucide-react';
+import { Mail, MapPin, Phone } from 'lucide-react';
 import logo2 from '../logo2.png';
 import { useCmsContent } from '../hooks/useCmsContent';
 
@@ -18,18 +18,10 @@ export default function Footer() {
             <p className="text-slate-600 font-sans leading-relaxed max-w-md mb-6">
               {footer.description || 'Soluciones integrales de ingenieria disenadas para optimizar, proteger y potenciar la infraestructura critica de su empresa con los mas altos estandares de calidad.'}
             </p>
-            <div className="flex gap-4">
-              <a href={footer.linkedinUrl || '#'} className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-industrial-cyan hover:text-white transition-colors">
-                <Linkedin className="w-5 h-5" />
-              </a>
-              <a href={footer.mailUrl || 'mailto:info@groupemingser.com'} className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-industrial-cyan hover:text-white transition-colors">
-                <Mail className="w-5 h-5" />
-              </a>
-            </div>
           </div>
           
           <div>
-            <h4 className="font-display font-bold text-carbon mb-6 uppercase tracking-wider text-sm">Enlaces Rápidos</h4>
+            <h4 className="font-display font-bold text-carbon mb-6 uppercase tracking-wider text-sm">Enlaces Rapidos</h4>
             <ul className="space-y-3 font-sans text-slate-600">
               <li><Link to="/" className="hover:text-industrial-cyan transition-colors">Inicio</Link></li>
               <li><Link to="/nosotros" className="hover:text-industrial-cyan transition-colors">Nosotros</Link></li>
@@ -58,14 +50,11 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-slate-200 pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-sm font-mono text-slate-500">
-          <p>� {new Date().getFullYear()} {footer.copyright || 'Group Emingser S.R.L. | One World Engineering. Todos los derechos reservados.'}</p>
-          <div className="flex gap-6">
-            <a href="#" className="hover:text-industrial-cyan transition-colors">Términos</a>
-            <a href="#" className="hover:text-industrial-cyan transition-colors">Privacidad</a>
-          </div>
+        <div className="border-t border-slate-200 pt-8 text-center text-sm font-mono text-slate-500 md:text-left">
+          <p>(c) {new Date().getFullYear()} {footer.copyright || 'Group Emingser S.R.L. | One World Engineering. Todos los derechos reservados.'}</p>
         </div>
       </div>
     </footer>
   );
 }
+

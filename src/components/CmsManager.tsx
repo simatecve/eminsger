@@ -134,7 +134,7 @@ const cmsSections: CmsSection[] = [
   {
     id: 'footer',
     title: 'Footer',
-    description: 'Descripcion, contacto y enlaces sociales del pie de pagina.',
+    description: 'Descripcion y contacto del pie de pagina.',
     sections: ['footer.main'],
     fields: [
       { key: 'description', label: 'Descripcion', type: 'textarea' },
@@ -142,8 +142,6 @@ const cmsSections: CmsSection[] = [
       { key: 'phone', label: 'Telefono' },
       { key: 'email', label: 'Email' },
       { key: 'copyright', label: 'Copyright' },
-      { key: 'linkedinUrl', label: 'LinkedIn URL' },
-      { key: 'mailUrl', label: 'Mail URL' },
     ],
   },
 ];

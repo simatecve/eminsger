@@ -588,8 +588,6 @@ export const cmsDefaults: CmsBlock[] = [
       phone: '+1 (809) 000-0000',
       email: 'info@groupemingser.com',
       copyright: 'Group Emingser S.R.L. | One World Engineering. Todos los derechos reservados.',
-      linkedinUrl: '#',
-      mailUrl: 'mailto:info@groupemingser.com',
     },
   },
 ];
